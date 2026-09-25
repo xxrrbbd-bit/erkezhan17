@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="kk" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SÄT — Поэзия Кеші | Электронды Шақыру</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Cyrillic Serif & Script -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Marck+Script&family=Cinzel:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti & GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        night: {
+                            900: '#060B19',
+                            800: '#0B132B',
+                            700: '#1C2541',
+                            600: '#2A385B',
+                        },
+                        ivory: '#F7F4EA',
+                        champagne: '#F3E5AB',
+                        gold: {
+                            light: '#F8E08E',
+                            DEFAULT: '#D4AF37',
+                            dark: '#AA820A',
+                            accent: '#E6C665'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        cinzel: ['"Cinzel"', 'serif'],
+                        script: ['"Marck Script"', '"Caveat"', 'cursive'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #060B19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2A385B;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
+
+        /* Ambient Glow Effects */
+        .gold-glow-text {
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.4), 0 0 25px rgba(212, 175, 55, 0.2);
+        }
+        .gold-glow-box {
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.15);
+        }
+        .moonlight-glow {
+            background: radial-gradient(circle at 50% 20%, rgba(243, 229, 171, 0.18) 0%, rgba(28, 37, 65, 0.05) 50%, transparent 80%);
+        }
+
+        /* Gold metallic text gradient */
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF5C0 0%, #D4AF37 50%, #997A15 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Shimmer effect across main header */
+        .shimmer-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer-effect::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                60deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.15) 50%,
+                transparent 70%
+            );
+            transform: rotate(30deg);
+            animation: shimmerMove 6s infinite linear;
+        }
+        @keyframes shimmerMove {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+
+        /* Parchment Paper Texture Overlay */
+        .paper-texture {
+            background-color: #0d152a;
+            background-image: radial-gradient(#1c2847 1px, transparent 0), radial-gradient(#1c2847 1px, #0b132b 85%);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+        }
+
+        /* 3D Book Flip Effects */
+        .perspective-1000 {
+            perspective: 1200px;
+        }
+        .book-container {
+            transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+        .book-page {
+            backface-visibility: hidden;
+            transform-origin: left center;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1), box-shadow 0.8s ease;
+        }
+
+        /* SVG Handwriting Path Animation */
+        .svg-sat-text {
+            stroke-dasharray: 800;
+            stroke-dashoffset: 800;
+            animation: drawText 4s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.8s;
+        }
+        @keyframes drawText {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Subtle floating animations */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+        .animate-float-slow {
+            animation: floatSlow 6s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
+
+        /* Delicate border flourishes */
+        .corner-border {
+            position: relative;
+        }
+        .corner-border::before, .corner-border::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-color: rgba(212, 175, 55, 0.6);
+            pointer-events: none;
+        }
+        .corner-border::before {
+            top: 10px;
+            left: 10px;
+            border-top: 1px solid;
+            border-left: 1px solid;
+        }
+        .corner-border::after {
+            bottom: 10px;
+            right: 10px;
+            border-bottom: 1px solid;
+            border-right: 1px solid;
+        }
+    </style>
+</head>
+<body class="h-full bg-night-900 text-ivory font-serif overflow-x-hidden selection:bg-gold selection:text-night-900 flex flex-col justify-between">
+
+    <canvas id="ambientCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+    <div class="fixed inset-0 moonlight-glow pointer-events-none z-0"></div>
+
+    <!-- Audio Controller & Ambient Music -->
+    <div class="fixed top-5 right-5 z-50 flex items-center gap-3">
+        <button id="musicToggleBtn" onclick="toggleAudio()" class="group bg-night-800/80 hover:bg-night-700 backdrop-blur-md border border-gold/30 hover:border-gold/80 text-gold px-4 py-2.5 rounded-full text-xs font-sans tracking-widest uppercase transition-all duration-300 flex items-center gap-2 shadow-lg">
+            <i id="musicIcon" class="fa-solid fa-volume-xmark text-gold"></i>
+            <span id="musicText" class="hidden sm:inline">Музыка</span>
+        </button>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="relative z-10 min-h-screen flex flex-col justify-between items-center px-4 py-6 sm:py-10">
+
+        <!-- STAGE 1: CINEMATIC INTRO OVERLAY -->
+        <div id="introScreen" class="fixed inset-0 z-40 bg-night-900 flex flex-col items-center justify-center p-6 text-center transition-opacity duration-1000">
+            <!-- Ambient Moonlight Effect behind logo -->
+            <div class="absolute w-96 h-96 rounded-full bg-champagne/10 blur-3xl animate-pulse-glow pointer-events-none"></div>
+
+            <!-- SVG Handwriting Word "Sät" -->
+            <div class="relative mb-6 max-w-xs sm:max-w-md w-full">
+                <svg class="w-full h-32 sm:h-44" viewBox="0 0 500 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <text x="50%" y="65%" text-anchor="middle" font-family="'Marck Script', 'Cormorant Garamond', serif" font-size="110" font-weight="bold" fill="none" stroke="url(#goldGrad)" stroke-width="2.5" class="svg-sat-text">
+                        Sät
+                    </text>
+                    <defs>
+                        <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#FFF5C0" />
+                            <stop offset="50%" stop-color="#D4AF37" />
+                            <stop offset="100%" stop-color="#AA820A" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <p id="introSubQuote" class="text-champagne/70 font-script text-xl sm:text-2xl opacity-0 transition-opacity duration-1000 mt-2">
+                    «Жүрек айтпағанды, жыр айтады…»
+                </p>
+            </div>
+
+            <div id="introButtonContainer" class="opacity-0 transition-all duration-1000 transform translate-y-4">
+                <button onclick="enterInvitation()" class="relative group overflow-hidden rounded-full p-[1px] focus:outline-none">
+                    <span class="absolute inset-0 bg-gradient-to-r from-gold/40 via-champagne/80 to-gold/40 rounded-full animate-pulse"></span>
+                    <div class="relative px-8 py-3.5 bg-night-800 rounded-full transition-all duration-300 group-hover:bg-night-700/90 flex items-center gap-3">
+                        <i class="fa-solid fa-book-open text-gold text-sm group-hover:scale-110 transition-transform"></i>
+                        <span class="font-sans text-xs sm:text-sm tracking-widest text-champagne uppercase font-medium">Шақыруды ашу</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- STAGE 2: MAIN INVITATION CONTENT (Book Experience & Cards) -->
+        <!-- HEADER / NAVIGATION BRAND -->
+        <header id="mainHeader" class="w-full max-w-4xl mx-auto flex flex-col items-center text-center my-2 sm:my-4 opacity-0 transition-opacity duration-1000">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gold/20 bg-night-800/40 backdrop-blur-md mb-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-gold animate-ping"></span>
+                <span class="text-[11px] font-sans text-champagne/80 uppercase tracking-widest">Астана • Поэзия кеші</span>
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-cinzel font-bold text-transparent bg-clip-text bg-gradient-to-r from-champagne via-gold to-gold-light tracking-widest gold-glow-text">
+                SÄT
+            </h1>
+            <p class="text-sm sm:text-base font-script text-champagne/80 mt-1">«Сөзден сыр, жырдан сезім табылатын кеш…»</p>
+        </header>
+
+        <!-- MAIN BOOK / INVITATION FLIP CONTAINER -->
+        <div id="invitationBook" class="w-full max-w-3xl my-4 sm:my-8 opacity-0 transition-all duration-1000 transform translate-y-6">
+            
+            <!-- CONTROLS & PAGE TABS -->
+            <div class="flex justify-center items-center gap-2 mb-4 font-sans text-xs">
+                <button onclick="switchTab(0)" id="tabBtn0" class="px-4 py-2 rounded-full border border-gold/40 bg-gold/20 text-champagne font-medium transition-all shadow-md">
+                    1. Шақыру
+                </button>
+                <button onclick="switchTab(1)" id="tabBtn1" class="px-4 py-2 rounded-full border border-gold/20 bg-night-800/60 text-ivory/60 hover:text-champagne transition-all">
+                    2. Кеш бағдарламасы
+                </button>
+                <button onclick="switchTab(2)" id="tabBtn2" class="px-4 py-2 rounded-full border border-gold/20 bg-night-800/60 text-ivory/60 hover:text-champagne transition-all">
+                    3. Қатысуды растау
+                </button>
+            </div>
+
+            <!-- TABS CONTENT SHEETS -->
+            <div class="relative bg-night-800/80 backdrop-blur-xl border border-gold/30 rounded-2xl p-6 sm:p-10 shadow-2xl corner-border gold-glow-box min-h-[480px] flex flex-col justify-between overflow-hidden">
+                
+                <!-- Background Decorative Gold Mandala/Flourish -->
+                <div class="absolute -right-20 -bottom-20 w-80 h-80 opacity-5 pointer-events-none">
+                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full stroke-gold fill-none" stroke-width="1">
+                        <circle cx="100" cy="100" r="90" stroke-dasharray="4 4" />
+                        <circle cx="100" cy="100" r="70" />
+                        <polygon points="100,10 120,80 190,100 120,120 100,190 80,120 10,100 80,80" />
+                    </svg>
+                </div>
+
+                <!-- TAB 1: MAIN INVITATION -->
+                <div id="tabContent0" class="tab-pane flex flex-col items-center text-center space-y-6 my-auto">
+                    
+                    <div class="space-y-2">
+                        <span class="text-xs font-sans tracking-widest text-gold uppercase">Құрметті қонағымыз</span>
+                        <h2 class="text-2xl sm:text-4xl font-serif font-bold text-champagne shimmer-effect py-1">
+                            ПОЭЗИЯ КЕШІ
+                        </h2>
+                        <div class="w-24 h-[1px] bg-gradient-to-r from-transparent via-gold to-transparent mx-auto my-3"></div>
+                    </div>
+
+                    <blockquote class="italic text-champagne/90 text-lg sm:text-2xl max-w-lg font-serif leading-relaxed px-4">
+                        «Жүрекке жақын жырлар,<br class="hidden sm:block"> көңілге қонған сөздер…»
+                    </blockquote>
+
+                    <p class="text-base sm:text-lg font-sans text-ivory/80 max-w-xl font-light leading-relaxed">
+                        Сіздерді поэзия мен сезім тоғысқан ерекше кешке шақырамыз! Сөздің құдіретін сезініп, жанға жылу сыйлайтын әсем жырларды бірге тыңдайық.
+                    </p>
+
+                    <!-- DETAILS GRID -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full pt-4 font-sans">
+                        <div class="bg-night-900/60 border border-gold/20 rounded-xl p-4 flex flex-col items-center hover:border-gold/50 transition-colors">
+                            <i class="fa-regular fa-calendar-days text-gold text-xl mb-2"></i>
+                            <span class="text-xs text-champagne/60 uppercase tracking-wider">Күні</span>
+                            <span class="text-base font-semibold text-champagne mt-0.5">26.09.2026</span>
+                        </div>
+                        <div class="bg-night-900/60 border border-gold/20 rounded-xl p-4 flex flex-col items-center hover:border-gold/50 transition-colors">
+                            <i class="fa-regular fa-clock text-gold text-xl mb-2"></i>
+                            <span class="text-xs text-champagne/60 uppercase tracking-wider">Уақыты</span>
+                            <span class="text-base font-semibold text-champagne mt-0.5">18:00</span>
+                        </div>
+                        <div class="bg-night-900/60 border border-gold/20 rounded-xl p-4 flex flex-col items-center hover:border-gold/50 transition-colors">
+                            <i class="fa-solid fa-location-dot text-gold text-xl mb-2"></i>
+                            <span class="text-xs text-champagne/60 uppercase tracking-wider">Орны</span>
+                            <span class="text-base font-semibold text-champagne mt-0.5">Ақ шатыр</span>
+                        </div>
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="flex flex-wrap justify-center gap-3 pt-2 font-sans text-xs">
+                        <button onclick="addToCalendar()" class="px-5 py-2.5 rounded-xl border border-gold/30 hover:border-gold bg-night-900/80 hover:bg-gold/10 text-champagne transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-plus text-gold"></i>
+                            Күнтізбеге қосу
+                        </button>
+                        <button onclick="openMapModal()" class="px-5 py-2.5 rounded-xl border border-gold/30 hover:border-gold bg-night-900/80 hover:bg-gold/10 text-champagne transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-map-location-dot text-gold"></i>
+                            Картадан қарау
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TAB 2: PROGRAM & POETRY QUOTES -->
+                <div id="tabContent1" class="tab-pane hidden flex-col justify-between space-y-6 my-auto">
+                    <div class="text-center">
+                        <span class="text-xs font-sans tracking-widest text-gold uppercase">Кеш бағдарламасы</span>
+                        <h3 class="text-2xl font-serif text-champagne mt-1">Рухани сәттер</h3>
+                        <div class="w-16 h-[1px] bg-gold/40 mx-auto my-2"></div>
+                    </div>
+
+                    <div class="space-y-4 font-sans">
+                        <div class="flex items-start gap-4 p-3 rounded-xl bg-night-900/40 border border-gold/10">
+                            <span class="px-3 py-1 rounded-lg bg-gold/20 text-gold text-xs font-mono">18:00</span>
+                            <div>
+                                <h4 class="text-sm font-semibold text-champagne">Қонақтарды қарсы алу & Элегиялық саз</h4>
+                                <p class="text-xs text-ivory/70 mt-0.5">Классикалық скрипка үні, майшам жарығы мен кіріспе сусындар.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 p-3 rounded-xl bg-night-900/40 border border-gold/10">
+                            <span class="px-3 py-1 rounded-lg bg-gold/20 text-gold text-xs font-mono">18:30</span>
+                            <div>
+                                <h4 class="text-sm font-semibold text-champagne">Поэзиялық шеру «Жүрек үні»</h4>
+                                <p class="text-xs text-ivory/70 mt-0.5">Белгілі ақындардың авторлық жырлары мен арнаулары.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 p-3 rounded-xl bg-night-900/40 border border-gold/10">
+                            <span class="px-3 py-1 rounded-lg bg-gold/20 text-gold text-xs font-mono">19:40</span>
+                            <div>
+                                <h4 class="text-sm font-semibold text-champagne">Еркін микрофон & Сөз сиқыры</h4>
+                                <p class="text-xs text-ivory/70 mt-0.5">Көрермендердің сүйікті өлеңдерін оқуы және пікір алмасу.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Quote Carousel -->
+                    <div class="p-4 rounded-xl bg-gradient-to-r from-night-900/80 via-night-800/80 to-night-900/80 border border-gold/20 text-center relative">
+                        <p id="quoteCarouselText" class="font-script text-xl sm:text-2xl text-gold-light transition-opacity duration-500">
+                            «Бір шумақ — бір сезім.»
+                        </p>
+                        <div class="flex justify-center gap-2 mt-3">
+                            <button onclick="prevQuote()" class="w-7 h-7 rounded-full bg-night-900/80 border border-gold/30 text-champagne hover:border-gold flex items-center justify-center text-xs">‹</button>
+                            <span id="quoteIndex" class="text-[10px] font-sans text-ivory/50 flex items-center">1 / 4</span>
+                            <button onclick="nextQuote()" class="w-7 h-7 rounded-full bg-night-900/80 border border-gold/30 text-champagne hover:border-gold flex items-center justify-center text-xs">›</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: RSVP FORM -->
+                <div id="tabContent2" class="tab-pane hidden flex-col justify-between space-y-5 my-auto">
+                    <div class="text-center">
+                        <span class="text-xs font-sans tracking-widest text-gold uppercase">Қатысуыңыз маңызды</span>
+                        <h3 class="text-2xl font-serif text-champagne mt-1">Кешке қатысуды растау</h3>
+                        <p class="text-xs font-sans text-ivory/60 mt-1">Сұрақтарға жауап беріп, өзіңізге арналған шақыру билетін алыңыз</p>
+                    </div>
+
+                    <form id="rsvpForm" onsubmit="handleRSVP(event)" class="space-y-4 font-sans">
+                        <div>
+                            <label class="block text-xs text-champagne/80 mb-1">Аты-жөніңіз *</label>
+                            <input type="text" id="guestName" required placeholder="Мәселен: Ерлан & Әсем" class="w-full bg-night-900/80 border border-gold/30 rounded-xl px-4 py-2.5 text-sm text-ivory focus:outline-none focus:border-gold transition-colors placeholder:text-ivory/30">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-champagne/80 mb-1">Қонақтар саны</label>
+                                <select id="guestCount" class="w-full bg-night-900/80 border border-gold/30 rounded-xl px-4 py-2.5 text-sm text-ivory focus:outline-none focus:border-gold transition-colors">
+                                    <option value="1">1 адам (Жеке)</option>
+                                    <option value="2">2 адам (Жұппен)</option>
+                                    <option value="3+">3 немесе одан көп</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-champagne/80 mb-1">Келе аласыз ба?</label>
+                                <select id="guestAttendance" class="w-full bg-night-900/80 border border-gold/30 rounded-xl px-4 py-2.5 text-sm text-ivory focus:outline-none focus:border-gold transition-colors">
+                                    <option value="Иә, әрине келемін">Иә, қуана келемін</option>
+                                    <option value="Өкінішке орай келе алмаймын">Өкінішке орай келе алмаймын</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-champagne/80 mb-1">Сүйікті өлеңіңіз немесе кешке тілек</label>
+                            <input type="text" id="guestPoem" placeholder="«Кейде бір өлең — мың ойдың жауабы...»" class="w-full bg-night-900/80 border border-gold/30 rounded-xl px-4 py-2.5 text-sm text-ivory focus:outline-none focus:border-gold transition-colors placeholder:text-ivory/30">
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-gold/80 via-gold to-gold-dark hover:brightness-110 text-night-900 font-semibold rounded-xl text-xs uppercase tracking-widest transition-all shadow-lg mt-2">
+                            Растауды жіберу
+                        </button>
+                    </form>
+
+                    <!-- Ticket Result Container -->
+                    <div id="rsvpTicket" class="hidden p-4 rounded-xl bg-night-900/90 border border-gold/50 text-center space-y-3">
+                        <i class="fa-solid fa-circle-check text-gold text-2xl"></i>
+                        <h4 class="text-base font-serif text-champagne font-bold">Рақмет! Сізді кеште асыға күтеміз!</h4>
+                        <p id="ticketDetails" class="text-xs font-sans text-ivory/80"></p>
+                        <button onclick="resetRSVP()" class="text-xs text-gold underline hover:text-champagne font-sans">Өзгерту</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- STAGE 3: POETIC WISHES / VISITOR NOTES FLOATING WALL -->
+        <section id="wishesSection" class="w-full max-w-3xl my-6 opacity-0 transition-all duration-1000 transform translate-y-6">
+            <div class="bg-night-800/40 backdrop-blur-md border border-gold/20 rounded-2xl p-6 text-center">
+                <h3 class="text-lg font-serif text-champagne mb-1">Кеш жазбалары мен жылы лебіздер</h3>
+                <p class="text-xs font-sans text-ivory/60 mb-4">Жүректен шыққан әр сөз — поэзия кешінің бөлшегі</p>
+                
+                <div id="wishesList" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left max-h-48 overflow-y-auto pr-1">
+                    <div class="p-3 rounded-xl bg-night-900/60 border border-gold/15">
+                        <p class="font-script text-gold-light text-base">«Поэзия — жанның сырласы.»</p>
+                        <span class="text-[10px] font-sans text-ivory/40 block mt-1">— Кеш ұйымдастырушылары</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-night-900/60 border border-gold/15">
+                        <p class="font-script text-gold-light text-base">«Сөз өнері — дертке дауа, жанға дауа.»</p>
+                        <span class="text-[10px] font-sans text-ivory/40 block mt-1">— Поэзия сүйер қауым</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER & FINAL CINEMATIC FADE TRIGGER -->
+        <footer id="mainFooter" class="w-full max-w-4xl mx-auto text-center py-6 border-t border-gold/10 opacity-0 transition-opacity duration-1000">
+            <p class="font-serif text-lg text-champagne/90 mb-2">
+                «Поэзия кешіне баршаңызды шақырамыз!»
+            </p>
+            <p class="font-script text-xl text-gold/80 mb-4">
+                «Sät — сөзбен сезінетін сәт.»
+            </p>
+            <button onclick="triggerFinalFade()" class="text-xs font-sans text-champagne/50 hover:text-gold tracking-widest uppercase transition-colors inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-moon text-gold/60"></i>
+                Түн құшағына ену (Қорытынды)
+            </button>
+        </footer>
+
+    </main>
+
+    <!-- MAP / VENUE MODAL -->
+    <div id="mapModal" class="fixed inset-0 z-50 bg-night-900/90 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="bg-night-800 border border-gold/40 rounded-2xl max-w-lg w-full p-6 relative gold-glow-box">
+            <button onclick="closeMapModal()" class="absolute top-4 right-4 text-ivory/60 hover:text-gold text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center mb-4">
+                <i class="fa-solid fa-compass-drafting text-gold text-2xl mb-2"></i>
+                <h3 class="text-xl font-serif text-champagne">«Ақ шатыр» салтанат сарайы</h3>
+                <p class="text-xs font-sans text-ivory/60">Мекен-жайы: Астана қаласы, Поэзия аллеясы, 12</p>
+            </div>
+            
+            <div class="w-full h-48 rounded-xl bg-night-900 border border-gold/20 flex flex-col items-center justify-center text-center p-4 relative overflow-hidden">
+                <!-- Map Stylized Graphic -->
+                <div class="absolute inset-0 bg-gradient-to-br from-night-900 via-night-800 to-night-900 opacity-80"></div>
+                <div class="relative z-10 space-y-2">
+                    <i class="fa-solid fa-location-dot text-gold text-3xl animate-bounce"></i>
+                    <p class="text-sm font-sans font-semibold text-champagne">Ақ шатыр</p>
+                    <span class="text-xs text-ivory/60 block">Жайлы орын, арнайы автотұрақ қарастырылған</span>
+                </div>
+            </div>
+
+            <div class="mt-4 flex gap-3">
+                <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" class="flex-1 text-center py-2.5 rounded-xl bg-gold text-night-900 font-sans font-semibold text-xs uppercase tracking-wider hover:brightness-110 transition-all">
+                    Google Maps арқылы ашу
+                </a>
+                <button onclick="closeMapModal()" class="px-4 py-2.5 rounded-xl border border-gold/30 text-champagne font-sans text-xs hover:border-gold">
+                    Жабу
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FINAL OUTRO SCREEN (FADE TO DARKNESS) -->
+    <div id="outroScreen" class="fixed inset-0 z-50 bg-night-900 opacity-0 pointer-events-none transition-opacity duration-2000 flex flex-col items-center justify-center p-6 text-center">
+        <div class="max-w-md space-y-6">
+            <h2 class="text-4xl sm:text-6xl font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-champagne via-gold to-gold-light gold-glow-text">
+                SÄT
+            </h2>
+            <p class="font-script text-2xl sm:text-3xl text-gold-light leading-relaxed">
+                «Sät — сөзбен сезінетін сәт.»
+            </p>
+            <p class="font-serif text-lg text-ivory/70 italic">
+                «Поэзия кешіне баршаңызды шақырамыз!»
+            </p>
+            <p class="font-sans text-xs text-champagne/40 tracking-widest pt-8 uppercase">
+                26.09.2026 • 18:00 • Ақ шатыр
+            </p>
+            <button onclick="replayInvitation()" class="mt-8 px-6 py-2.5 rounded-full border border-gold/30 text-champagne font-sans text-xs hover:border-gold hover:bg-gold/10 transition-all">
+                <i class="fa-solid fa-rotate-left mr-2"></i>Шақыруды қайта қарау
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC & ANIMATIONS -->
+    <script>
+        
+        // Canvas Particle & Floating Pages System
+        const canvas = document.getElementById('ambientCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        // Golden dust particles
+        const particles = [];
+        const particleCount = Math.min(Math.floor(width / 15), 60);
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                radius: Math.random() * 2 + 0.5,
+                color: `rgba(243, 229, 171, ${Math.random() * 0.6 + 0.2})`,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: -Math.random() * 0.4 - 0.1,
+                alpha: Math.random()
+            });
+        }
+
+        // Floating poetry pages / elements
+        const floatingPages = [];
+        const pageCount = 6;
+        const kazakhWords = ['Жүрек', 'Жыр', 'Сөз', 'Сезім', 'Сыр', 'Сәт', 'Әуен'];
+
+        for (let i = 0; i < pageCount; i++) {
+            floatingPages.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: Math.random() * 20 + 25,
+                angle: Math.random() * Math.PI * 2,
+                vAngle: (Math.random() - 0.5) * 0.005,
+                vx: (Math.random() - 0.5) * 0.2,
+                vy: -Math.random() * 0.2 - 0.05,
+                word: kazakhWords[i % kazakhWords.length],
+                opacity: Math.random() * 0.25 + 0.05
+            });
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw glowing golden particles
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.y < 0) p.y = height;
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+
+            // Draw drifting subtle paper leaves/words
+            floatingPages.forEach(fp => {
+                fp.x += fp.vx;
+                fp.y += fp.vy;
+                fp.angle += fp.vAngle;
+
+                if (fp.y < -50) fp.y = height + 50;
+                if (fp.x < -50) fp.x = width + 50;
+                if (fp.x > width + 50) fp.x = -50;
+
+                ctx.save();
+                ctx.translate(fp.x, fp.y);
+                ctx.rotate(fp.angle);
+
+                // Draw paper outline
+                ctx.fillStyle = `rgba(247, 244, 234, ${fp.opacity * 0.4})`;
+                ctx.strokeStyle = `rgba(212, 175, 55, ${fp.opacity * 0.6})`;
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.roundRect(-fp.size / 2, -fp.size * 0.7, fp.size, fp.size * 1.4, 4);
+                ctx.fill();
+                ctx.stroke();
+
+                // Draw handwritten Kazakh word inside page
+                ctx.fillStyle = `rgba(212, 175, 55, ${fp.opacity * 0.9})`;
+                ctx.font = `${Math.floor(fp.size * 0.4)}px "Marck Script", cursive`;
+                ctx.textAlign = 'center';
+                ctx.fillText(fp.word, 0, 0);
+
+                ctx.restore();
+            });
+
+            requestAnimationFrame(animateCanvas);
+        }
+
+        animateCanvas();
+
+        // Cinematic Intro Reveal Timeline
+        setTimeout(() => {
+            document.getElementById('introSubQuote').classList.remove('opacity-0');
+        }, 1800);
+
+        setTimeout(() => {
+            const btnCont = document.getElementById('introButtonContainer');
+            btnCont.classList.remove('opacity-0', 'translate-y-4');
+        }, 3200);
+
+        function enterInvitation() {
+            const intro = document.getElementById('introScreen');
+            intro.classList.add('opacity-0');
+            setTimeout(() => {
+                intro.style.display = 'none';
+                
+                // Show Header, Book, Wishes, Footer
+                document.getElementById('mainHeader').classList.remove('opacity-0');
+                
+                const book = document.getElementById('invitationBook');
+                book.classList.remove('opacity-0', 'translate-y-6');
+
+                const wishes = document.getElementById('wishesSection');
+                wishes.classList.remove('opacity-0', 'translate-y-6');
+
+                document.getElementById('mainFooter').classList.remove('opacity-0');
+            }, 1000);
+
+            // Play delicate sound if enabled or initialize Audio Context
+            if (!audioCtx) initAudio();
+        }
+
+        // Web Audio API Synthesizer (Zero External Dependencies)
+        let audioCtx = null;
+        let isPlaying = false;
+        let ambientInterval = null;
+
+        function initAudio() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            } catch (e) {
+                console.log('Audio Context not supported');
+            }
+        }
+
+        // Calming pentatonic harp/piano notes generator
+        const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33]; // C, D, E, G, A, C5, D5
+
+        function playSoftNote() {
+            if (!audioCtx || !isPlaying) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            const freq = notes[Math.floor(Math.random() * notes.length)];
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.type = 'sine';
+
+            // Soft envelope
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.3);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 3.5);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 3.6);
+        }
+
+        function toggleAudio() {
+            if (!audioCtx) initAudio();
+
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            isPlaying = !isPlaying;
+            const icon = document.getElementById('musicIcon');
+            const text = document.getElementById('musicText');
+
+            if (isPlaying) {
+                icon.className = 'fa-solid fa-volume-high text-gold animate-pulse';
+                text.textContent = 'Музыка қосулы';
+                ambientInterval = setInterval(playSoftNote, 1600);
+                playSoftNote();
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-gold';
+                text.textContent = 'Музыка';
+                clearInterval(ambientInterval);
+            }
+        }
+
+        function switchTab(index) {
+            for (let i = 0; i < 3; i++) {
+                const pane = document.getElementById(`tabContent${i}`);
+                const btn = document.getElementById(`tabBtn${i}`);
+                
+                if (i === index) {
+                    pane.classList.remove('hidden');
+                    pane.classList.add('flex');
+                    btn.className = 'px-4 py-2 rounded-full border border-gold/40 bg-gold/20 text-champagne font-medium transition-all shadow-md';
+                } else {
+                    pane.classList.add('hidden');
+                    pane.classList.remove('flex');
+                    btn.className = 'px-4 py-2 rounded-full border border-gold/20 bg-night-800/60 text-ivory/60 hover:text-champagne transition-all';
+                }
+            }
+        }
+
+        // Quotes Carousel Logic
+        const quotes = [
+            "«Бір шумақ — бір сезім.»",
+            "«Жүрек айтпағанды, жыр айтады…»",
+            "«Сөзден сыр, жырдан сезім табылатын кеш…»",
+            "«Кейде бір өлең — мың ойдың жауабы.»"
+        ];
+        let currentQuote = 0;
+
+        function updateQuote() {
+            const textEl = document.getElementById('quoteCarouselText');
+            const idxEl = document.getElementById('quoteIndex');
+            textEl.style.opacity = 0;
+            
+            setTimeout(() => {
+                textEl.textContent = quotes[currentQuote];
+                idxEl.textContent = `${currentQuote + 1} / ${quotes.length}`;
+                textEl.style.opacity = 1;
+            }, 300);
+        }
+
+        function nextQuote() {
+            currentQuote = (currentQuote + 1) % quotes.length;
+            updateQuote();
+        }
+
+        function prevQuote() {
+            currentQuote = (currentQuote - 1 + quotes.length) % quotes.length;
+            updateQuote();
+        }
+
+        function handleRSVP(e) {
+            e.preventDefault();
+            const name = document.getElementById('guestName').value;
+            const count = document.getElementById('guestCount').value;
+            const attendance = document.getElementById('guestAttendance').value;
+            const poem = document.getElementById('guestPoem').value;
+
+            document.getElementById('rsvpForm').classList.add('hidden');
+            const ticket = document.getElementById('rsvpTicket');
+            const details = document.getElementById('ticketDetails');
+
+            details.innerHTML = `<strong>${name}</strong>, сіздің жауабыңыз қабылданды.<br>Қонақтар саны: ${count} • Мәртебесі: ${attendance}`;
+            ticket.classList.remove('hidden');
+
+            // If user left a custom poem/wish, append to wish wall
+            if (poem.trim()) {
+                const wishesList = document.getElementById('wishesList');
+                const newWish = document.createElement('div');
+                newWish.className = 'p-3 rounded-xl bg-night-900/80 border border-gold/30 transition-all transform scale-95 opacity-0';
+                newWish.innerHTML = `
+                    <p class="font-script text-gold-light text-base">«${poem.trim()}»</p>
+                    <span class="text-[10px] font-sans text-champagne/60 block mt-1">— ${name}</span>
+                `;
+                wishesList.prepend(newWish);
+                setTimeout(() => {
+                    newWish.classList.remove('scale-95', 'opacity-0');
+                }, 100);
+            }
+        }
+
+        function resetRSVP() {
+            document.getElementById('rsvpForm').classList.remove('hidden');
+            document.getElementById('rsvpTicket').classList.add('hidden');
+        }
+
+        // Calendar .ics Generator
+        function addToCalendar() {
+            const title = "SÄT — Поэзия Кеші";
+            const details = "Поэзия мен сезім тоғысқан ерекше кеш.";
+            const location = "Ақ шатыр, Астана";
+            const startDate = "20260926T180000";
+            const endDate = "20260926T210000";
+
+            const icsData = 
+`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Sat Poetry Evening//KK
+BEGIN:VEVENT
+SUMMARY:${title}
+DESCRIPTION:${details}
+LOCATION:${location}
+DTSTART:${startDate}
+DTEND:${endDate}
+END:VEVENT
+END:VCALENDAR`;
+
+            const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', 'Sat_Poetry_Evening.ics');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Map Modal Control
+        function openMapModal() {
+            const modal = document.getElementById('mapModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeMapModal() {
+            const modal = document.getElementById('mapModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function triggerFinalFade() {
+            const outro = document.getElementById('outroScreen');
+            outro.classList.remove('pointer-events-none');
+            outro.style.opacity = '1';
+        }
+
+        function replayInvitation() {
+            const outro = document.getElementById('outroScreen');
+            outro.style.opacity = '0';
+            outro.classList.add('pointer-events-none');
+        }
+    </script>
+</body>
+</html>
